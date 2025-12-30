@@ -78,23 +78,41 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => {
-                    if (!confirm("Delete this timer?")) return;
-                    deleteTimer(t.id);
-                    refresh();
-                  }}
-                  style={{
-                    padding: "8px 12px",
-                    borderRadius: 10,
-                    border: "1px solid #fee2e2",
-                    background: "#fff1f2",
-                    fontWeight: 800,
-                    cursor: "pointer",
-                  }}
-                >
-                  Delete
-                </button>
+                {/* STEP 14: Edit + Delete */}
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <Link
+                    href={`/timer/${t.id}/edit`}
+                    style={{
+                      padding: "8px 12px",
+                      borderRadius: 10,
+                      border: "1px solid #e5e7eb",
+                      background: "white",
+                      textDecoration: "none",
+                      color: "#111",
+                      fontWeight: 800,
+                    }}
+                  >
+                    Edit
+                  </Link>
+
+                  <button
+                    onClick={() => {
+                      if (!confirm("Delete this timer?")) return;
+                      deleteTimer(t.id);
+                      refresh();
+                    }}
+                    style={{
+                      padding: "8px 12px",
+                      borderRadius: 10,
+                      border: "1px solid #fee2e2",
+                      background: "#fff1f2",
+                      fontWeight: 800,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
 
               <div style={{ color: "#6b7280", fontSize: 13 }}>
