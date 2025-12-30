@@ -5,15 +5,16 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { uid, formatMMSS } from "@/lib/utils";
-import { Timer, Interval, defaultTimerSettings } from "@/lib/types";
+import { Timer, Interval, defaultTimerSettings, CountdownSetting } from "@/lib/types";
 import { saveTimer } from "@/lib/db";
 
 import { IntervalEditorRow } from "@/components/IntervalEditorRow";
 
 export default function NewTimerPage() {
+  const router = useRouter();
+
   const initialTimer: Timer = useMemo(() => {
     const now = new Date().toISOString();
-
     return {
       id: uid("timer"),
       name: "[30] D1",
@@ -30,7 +31,6 @@ export default function NewTimerPage() {
   }, []);
 
   const [timer, setTimer] = useState<Timer>(initialTimer);
-  const router = useRouter();
 
   const totalSeconds = timer.intervals.reduce((sum, i) => sum + i.seconds, 0);
 
@@ -57,6 +57,14 @@ export default function NewTimerPage() {
         ...t.intervals,
         { id: uid("int"), title: "New Interval", seconds: 60, color: "gray" },
       ],
+      updatedAt: new Date().toISOString(),
+    }));
+  }
+
+  function setCountdownBeep(v: CountdownSetting) {
+    setTimer((t) => ({
+      ...t,
+      settings: { ...t.settings, countdownBeep: v },
       updatedAt: new Date().toISOString(),
     }));
   }
@@ -89,30 +97,67 @@ export default function NewTimerPage() {
           borderRadius: 12,
           background: "white",
           display: "grid",
-          gap: 10,
+          gap: 12,
         }}
       >
-        <label style={{ fontWeight: 800 }}>Name</label>
-        <input
-          value={timer.name}
-          onChange={(e) =>
-            setTimer((t) => ({
-              ...t,
-              name: e.target.value,
-              updatedAt: new Date().toISOString(),
-            }))
-          }
-          style={{
-            padding: "10px 12px",
-            borderRadius: 12,
-            border: "1px solid #e5e7eb",
-            fontSize: 16,
-            fontWeight: 700,
-          }}
-        />
+        <div style={{ display: "grid", gap: 8 }}>
+          <label style={{ fontWeight: 800 }}>Name</label>
+          <input
+            value={timer.name}
+            onChange={(e) =>
+              setTimer((t) => ({
+                ...t,
+                name: e.target.value,
+                updatedAt: new Date().toISOString(),
+              }))
+            }
+            style={{
+              padding: "10px 12px",
+              borderRadius: 12,
+              border: "1px solid #e5e7eb",
+              fontSize: 16,
+              fontWeight: 700,
+            }}
+          />
+        </div>
 
         <div style={{ color: "#6b7280" }}>
           Total: {formatMMSS(totalSeconds)} • {timer.intervals.length} intervals
+        </div>
+
+        <div style={{ display: "grid", gap: 10 }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <label style={{ fontWeight: 800, minWidth: 160 }}>Sound Enabled</label>
+            <input
+              type="checkbox"
+              checked={timer.settings.soundEnabled}
+              onChange={(e) =>
+                setTimer((t) => ({
+                  ...t,
+                  settings: { ...t.settings, soundEnabled: e.target.checked },
+                  updatedAt: new Date().toISOString(),
+                }))
+              }
+            />
+          </div>
+
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <label style={{ fontWeight: 800, minWidth: 160 }}>Countdown Beeps</label>
+            <select
+              value={timer.settings.countdownBeep}
+              onChange={(e) => setCountdownBeep(e.target.value as CountdownSetting)}
+              style={{
+                padding: "8px 10px",
+                borderRadius: 10,
+                border: "1px solid #e5e7eb",
+              }}
+            >
+              <option value="none">No countdown</option>
+              <option value="3">3 seconds</option>
+              <option value="5">5 seconds</option>
+              <option value="10">10 seconds</option>
+            </select>
+          </div>
         </div>
       </section>
 

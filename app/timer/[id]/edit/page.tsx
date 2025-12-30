@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { Timer, Interval } from "@/lib/types";
+import { Timer, Interval, CountdownSetting, defaultTimerSettings } from "@/lib/types";
 import { getTimerById, saveTimer } from "@/lib/db";
 import { formatMMSS, uid } from "@/lib/utils";
 import { IntervalEditorRow } from "@/components/IntervalEditorRow";
@@ -17,7 +17,17 @@ export default function EditTimerPage() {
 
   useEffect(() => {
     const found = getTimerById(params.id);
-    setTimer(found);
+
+    // Backfill settings for older timers that don’t have countdownBeep yet
+    if (found) {
+      const merged: Timer = {
+        ...found,
+        settings: { ...defaultTimerSettings, ...found.settings },
+      };
+      setTimer(merged);
+    } else {
+      setTimer(null);
+    }
   }, [params.id]);
 
   if (!timer) {
@@ -70,6 +80,18 @@ export default function EditTimerPage() {
     );
   }
 
+  function setCountdownBeep(v: CountdownSetting) {
+    setTimer((t) =>
+      !t
+        ? t
+        : {
+            ...t,
+            settings: { ...t.settings, countdownBeep: v },
+            updatedAt: new Date().toISOString(),
+          }
+    );
+  }
+
   return (
     <main style={{ padding: 24, maxWidth: 980, margin: "0 auto" }}>
       <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -98,28 +120,69 @@ export default function EditTimerPage() {
           borderRadius: 12,
           background: "white",
           display: "grid",
-          gap: 10,
+          gap: 12,
         }}
       >
-        <label style={{ fontWeight: 800 }}>Name</label>
-        <input
-          value={timer.name}
-          onChange={(e) =>
-            setTimer((t) =>
-              !t ? t : { ...t, name: e.target.value, updatedAt: new Date().toISOString() }
-            )
-          }
-          style={{
-            padding: "10px 12px",
-            borderRadius: 12,
-            border: "1px solid #e5e7eb",
-            fontSize: 16,
-            fontWeight: 700,
-          }}
-        />
+        <div style={{ display: "grid", gap: 8 }}>
+          <label style={{ fontWeight: 800 }}>Name</label>
+          <input
+            value={timer.name}
+            onChange={(e) =>
+              setTimer((t) =>
+                !t ? t : { ...t, name: e.target.value, updatedAt: new Date().toISOString() }
+              )
+            }
+            style={{
+              padding: "10px 12px",
+              borderRadius: 12,
+              border: "1px solid #e5e7eb",
+              fontSize: 16,
+              fontWeight: 700,
+            }}
+          />
+        </div>
 
         <div style={{ color: "#6b7280" }}>
           Total: {formatMMSS(totalSeconds)} • {timer.intervals.length} intervals
+        </div>
+
+        <div style={{ display: "grid", gap: 10 }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <label style={{ fontWeight: 800, minWidth: 160 }}>Sound Enabled</label>
+            <input
+              type="checkbox"
+              checked={timer.settings.soundEnabled}
+              onChange={(e) =>
+                setTimer((t) =>
+                  !t
+                    ? t
+                    : {
+                        ...t,
+                        settings: { ...t.settings, soundEnabled: e.target.checked },
+                        updatedAt: new Date().toISOString(),
+                      }
+                )
+              }
+            />
+          </div>
+
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <label style={{ fontWeight: 800, minWidth: 160 }}>Countdown Beeps</label>
+            <select
+              value={timer.settings.countdownBeep}
+              onChange={(e) => setCountdownBeep(e.target.value as CountdownSetting)}
+              style={{
+                padding: "8px 10px",
+                borderRadius: 10,
+                border: "1px solid #e5e7eb",
+              }}
+            >
+              <option value="none">No countdown</option>
+              <option value="3">3 seconds</option>
+              <option value="5">5 seconds</option>
+              <option value="10">10 seconds</option>
+            </select>
+          </div>
         </div>
       </section>
 

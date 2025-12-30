@@ -7,9 +7,12 @@ export type Interval = {
   color: IntervalColor;
 };
 
+export type CountdownSetting = "none" | "3" | "5" | "10";
+
 export type TimerSettings = {
   allowOverrun: boolean;
   soundEnabled: boolean;
+  countdownBeep: CountdownSetting; // NEW
 };
 
 export type Timer = {
@@ -24,4 +27,5 @@ export type Timer = {
 export const defaultTimerSettings: TimerSettings = {
   allowOverrun: false,
   soundEnabled: true,
+  countdownBeep: "3", // default (matches what you liked)
 };
