@@ -78,8 +78,22 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* STEP 14: Edit + Delete */}
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <Link
+                    href={`/timer/${t.id}/run`}
+                    style={{
+                      padding: "8px 12px",
+                      borderRadius: 10,
+                      border: "1px solid #111",
+                      background: "#111",
+                      textDecoration: "none",
+                      color: "white",
+                      fontWeight: 800,
+                    }}
+                  >
+                    Run
+                  </Link>
+
                   <Link
                     href={`/timer/${t.id}/edit`}
                     style={{
