@@ -2,13 +2,18 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+
 import { uid, formatMMSS } from "@/lib/utils";
 import { Timer, Interval, defaultTimerSettings } from "@/lib/types";
+import { saveTimer } from "@/lib/db";
+
 import { IntervalEditorRow } from "@/components/IntervalEditorRow";
 
 export default function NewTimerPage() {
   const initialTimer: Timer = useMemo(() => {
     const now = new Date().toISOString();
+
     return {
       id: uid("timer"),
       name: "[30] D1",
@@ -25,6 +30,7 @@ export default function NewTimerPage() {
   }, []);
 
   const [timer, setTimer] = useState<Timer>(initialTimer);
+  const router = useRouter();
 
   const totalSeconds = timer.intervals.reduce((sum, i) => sum + i.seconds, 0);
 
@@ -90,7 +96,11 @@ export default function NewTimerPage() {
         <input
           value={timer.name}
           onChange={(e) =>
-            setTimer((t) => ({ ...t, name: e.target.value, updatedAt: new Date().toISOString() }))
+            setTimer((t) => ({
+              ...t,
+              name: e.target.value,
+              updatedAt: new Date().toISOString(),
+            }))
           }
           style={{
             padding: "10px 12px",
@@ -131,6 +141,26 @@ export default function NewTimerPage() {
         }}
       >
         + Add Interval
+      </button>
+
+      <button
+        onClick={() => {
+          saveTimer(timer);
+          router.push("/");
+        }}
+        style={{
+          marginTop: 12,
+          width: "100%",
+          padding: "12px 14px",
+          borderRadius: 12,
+          border: "1px solid #111",
+          background: "#111",
+          color: "white",
+          fontWeight: 900,
+          cursor: "pointer",
+        }}
+      >
+        Save Timer
       </button>
     </main>
   );
