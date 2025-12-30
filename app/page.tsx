@@ -5,8 +5,15 @@ import Link from "next/link";
 export default function HomePage() {
   return (
     <main style={{ padding: 24, maxWidth: 900, margin: "0 auto" }}>
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <header
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <h1 style={{ margin: 0 }}>Custom Timers</h1>
+
         <Link
           href="/timer/new"
           style={{
@@ -35,8 +42,8 @@ export default function HomePage() {
           This is the home screen for your Custom Timer app.
         </p>
         <p>
-          Next, we’ll add the ability to create and run interval timers
-          like Seconds Pro.
+          Next, we’ll add the ability to create and run interval timers like
+          Seconds Pro.
         </p>
       </section>
     </main>
